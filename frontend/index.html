@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Summarizer — Powered by Claude AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #e2e8f0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border-radius: 16px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .upload-area {
+            margin-bottom: 30px;
+        }
+
+        .drag-drop-zone {
+            border: 2px dashed rgba(148, 163, 184, 0.3);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(30, 41, 59, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drag-drop-zone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(96, 165, 250, 0.05) 100%);
+            pointer-events: none;
+        }
+
+        .drag-drop-zone:hover {
+            border-color: rgba(148, 163, 184, 0.5);
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .drag-drop-zone.drag-over {
+            border-color: #60a5fa;
+            background: rgba(96, 165, 250, 0.1);
+            box-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 8px;
+        }
+
+        .upload-hint {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-name {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background: rgba(96, 165, 250, 0.1);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            border-radius: 8px;
+            color: #60a5fa;
+            font-size: 14px;
+            word-break: break-all;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            color: white;
+            flex: 2;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(96, 165, 250, 0.4);
+        }
+
+        .btn-submit:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-clear {
+            background: rgba(148, 163, 184, 0.1);
+            color: #cbd5e1;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .btn-clear:hover {
+            background: rgba(148, 163, 184, 0.2);
+            border-color: rgba(148, 163, 184, 0.5);
+        }
+
+        .loading-container {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+        }
+
+        .loading-container.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(96, 165, 250, 0.2);
+            border-top-color: #60a5fa;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 15px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+            color: #fca5a5;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: #22c55e;
+            color: #86efac;
+        }
+
+        .result-section {
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            background: rgba(96, 165, 250, 0.1);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #60a5fa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-token {
+            background: rgba(167, 139, 250, 0.1);
+            border-color: rgba(167, 139, 250, 0.3);
+            color: #a78bfa;
+        }
+
+        .summary-content {
+            background: rgba(15, 23, 42, 0.4);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            line-height: 1.8;
+            color: #cbd5e1;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .summary-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .summary-content::-webkit-scrollbar-track {
+            background: rgba(148, 163, 184, 0.1);
+            border-radius: 10px;
+        }
+
+        .summary-content::-webkit-scrollbar-thumb {
+            background: rgba(96, 165, 250, 0.3);
+            border-radius: 10px;
+        }
+
+        .summary-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(96, 165, 250, 0.5);
+        }
+
+        .model-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(148, 163, 184, 0.1);
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 24px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn-submit {
+                flex: 1;
+            }
+
+            .drag-drop-zone {
+                padding: 30px 15px;
+            }
+
+            .upload-icon {
+                font-size: 36px;
+            }
+
+            .upload-text {
+                font-size: 14px;
+            }
+
+            .result-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .badges {
+                width: 100%;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PDF Summarizer</h1>
+            <p class="subtitle">Powered by Claude AI</p>
+        </header>
+
+        <div class="alert alert-error" id="errorAlert"></div>
+        <div class="alert alert-success" id="successAlert"></div>
+
+        <div class="upload-area">
+            <div class="drag-drop-zone" id="dragDropZone">
+                <span class="upload-icon">📄</span>
+                <p class="upload-text">Clique ou arraste seu PDF aqui</p>
+                <p class="upload-hint">Máximo 50MB • Apenas arquivos PDF</p>
+                <input type="file" id="fileInput" class="file-input" accept=".pdf" />
+                <div class="file-name" id="fileName"></div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-submit" id="submitBtn" disabled>
+                ⚡ Resumir Documento
+            </button>
+            <button class="btn-clear" id="clearBtn">
+                🔄 Limpar
+            </button>
+        </div>
+
+        <div class="loading-container" id="loadingContainer">
+            <div class="spinner"></div>
+            <p class="loading-text">Processando seu PDF... isso pode levar um momento.</p>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="result-header">
+                <span class="result-title">✨ Resumo Gerado</span>
+                <div class="badges">
+                    <span class="badge" id="pagesBadge"></span>
+                    <span class="badge badge-token" id="tokensBadge"></span>
+                </div>
+            </div>
+
+            <div class="summary-content" id="summaryContent"></div>
+
+            <div class="model-info" id="modelInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        const dragDropZone = document.getElementById('dragDropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const submitBtn = document.getElementById('submitBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const loadingContainer = document.getElementById('loadingContainer');
+        const resultSection = document.getElementById('resultSection');
+        const errorAlert = document.getElementById('errorAlert');
+        const successAlert = document.getElementById('successAlert');
+        const summaryContent = document.getElementById('summaryContent');
+        const pagesBadge = document.getElementById('pagesBadge');
+        const tokensBadge = document.getElementById('tokensBadge');
+        const modelInfo = document.getElementById('modelInfo');
+
+        const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+        const API_URL = 'http://localhost:8000/summarize';
+
+        // Drag and drop events
+        dragDropZone.addEventListener('click', () => fileInput.click());
+
+        dragDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dragDropZone.classList.add('drag-over');
+        });
+
+        dragDropZone.addEventListener('dragleave', () => {
+            dragDropZone.classList.remove('drag-over');
+        });
+
+        dragDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragDropZone.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            hideAlerts();
+
+            // Validar tipo
+            if (file.type !== 'application/pdf') {
+                showError('Por favor, selecione um arquivo PDF válido.');
+                return;
+            }
+
+            // Validar tamanho
+            if (file.size > MAX_FILE_SIZE) {
+                showError(`Arquivo muito grande. Máximo: 50MB (seu arquivo: ${(file.size / 1024 / 1024).toFixed(1)}MB)`);
+                return;
+            }
+
+            fileName.textContent = `✓ ${file.name}`;
+            submitBtn.disabled = false;
+        }
+
+        submitBtn.addEventListener('click', submitFile);
+        clearBtn.addEventListener('click', resetForm);
+
+        async function submitFile() {
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showError('Nenhum arquivo selecionado.');
+                return;
+            }
+
+            hideAlerts();
+            showLoading(true);
+            submitBtn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Erro ao processar o PDF');
+                }
+
+                const data = await response.json();
+
+                if (data.status === 'sucesso') {
+                    displayResult(data);
+                    showSuccess('PDF resumido com sucesso!');
+                } else {
+                    showError(data.mensagem || 'Erro ao processar o PDF');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showError(`Erro ao processar: ${error.message}`);
+            } finally {
+                showLoading(false);
+                submitBtn.disabled = false;
+            }
+        }
+
+        function displayResult(data) {
+            pagesBadge.textContent = `📄 ${data.paginas} página${data.paginas !== 1 ? 's' : ''}`;
+            tokensBadge.textContent = `🔤 ${data.tokens_entrada + data.tokens_saida} tokens`;
+            summaryContent.textContent = data.resumo;
+            modelInfo.textContent = `Modelo: ${data.modelo} | Entrada: ${data.tokens_entrada} tokens | Saída: ${data.tokens_saida} tokens`;
+
+            if (data.aviso) {
+                showError(`⚠️ ${data.aviso}`, true);
+            }
+
+            resultSection.classList.add('show');
+        }
+
+        function showLoading(show) {
+            if (show) {
+                loadingContainer.classList.add('show');
+                resultSection.classList.remove('show');
+            } else {
+                loadingContainer.classList.remove('show');
+            }
+        }
+
+        function showError(message, isWarning = false) {
+            errorAlert.textContent = message;
+            errorAlert.classList.add('show');
+            if (isWarning) {
+                errorAlert.innerHTML = `⚠️ ${message}`;
+            }
+        }
+
+        function showSuccess(message) {
+            successAlert.textContent = message;
+            successAlert.classList.add('show');
+        }
+
+        function hideAlerts() {
+            errorAlert.classList.remove('show');
+            successAlert.classList.remove('show');
+        }
+
+        function resetForm() {
+            fileInput.value = '';
+            fileName.textContent = '';
+            submitBtn.disabled = true;
+            resultSection.classList.remove('show');
+            loadingContainer.classList.remove('show');
+            hideAlerts();
+        }
+
+        console.log('✨ PDF Summarizer AI - Interface carregada');
+        console.log('API endpoint:', API_URL);
+    </script>
+</body>
+</html>

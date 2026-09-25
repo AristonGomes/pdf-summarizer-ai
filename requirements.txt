@@ -1,0 +1,192 @@
+# ============================================================================
+# PDF SUMMARIZER AI - Dependências do Projeto
+# ============================================================================
+# Instalar com: pip install -r requirements.txt
+# ============================================================================
+
+# ============================================================================
+# DEPENDÊNCIAS PRINCIPAIS
+# ============================================================================
+
+# Framework web assíncrono para API REST
+fastapi==0.135.2
+
+# Servidor ASGI com suporte a reloading automático
+uvicorn[standard]==0.42.0
+
+# Extração de texto de PDFs
+PyMuPDF==1.27.2.2
+
+# Cliente oficial para Google Gemini API
+google-generativeai==0.7.0
+
+# Carregamento de variáveis de ambiente do arquivo .env
+python-dotenv==1.2.2
+
+# Processamento de multipart form data (para upload de arquivos)
+python-multipart==0.0.22
+
+# ============================================================================
+# NOVAS DEPENDÊNCIAS: AUTENTICAÇÃO, DATABASE, CACHE
+# ============================================================================
+
+# Banco de dados ORM (SQLAlchemy)
+SQLAlchemy==2.0.36
+
+# Cliente Redis para cache
+redis==5.0.1
+
+# JWT para autenticação segura
+python-jose[cryptography]==3.3.0
+
+# Hashing seguro de senhas
+passlib[bcrypt]==1.7.4
+
+# Cryptography para JWT
+cryptography==42.0.8
+
+# Rate limiting para proteção contra abuso
+slowapi==0.1.9
+# ============================================================================
+
+# Biblioteca HTTP simples
+requests==2.33.0
+
+# Validação de dados com suporte a type hints
+pydantic==2.12.5
+
+# Biblioteca principal do Pydantic (núcleo de validação)
+pydantic-core==2.41.5
+
+# Tipos adicionais para anotações
+annotated-types==0.7.0
+
+# Framework para tipo de inspeção
+typing-extensions==4.15.0
+
+# Cliente HTTP assíncrono
+httpx==0.28.1
+
+# Core do httpx
+httpcore==1.0.9
+
+# Async primitivos
+anyio==4.13.0
+
+# Parser de docstrings
+docstring-parser==0.17.0
+
+# Detecção de interpretador do SO
+distro==1.9.0
+
+# JSON parsing rápido
+jiter==0.13.0
+
+# Biblioteca de detecção de I/O
+sniffio==1.3.1
+
+# Certificados SSL
+certifi==2026.2.25
+
+# Normalizador de charset
+charset-normalizer==3.4.6
+
+# Parser de URLs
+urllib3==2.6.3
+
+# Codificação/decodificação de IDs internacionalizados
+idna==3.11
+
+# ============================================================================
+# DEPENDÊNCIAS DO WEB FRAMEWORK
+# ============================================================================
+
+# Framework web leve para rotas e middleware ASGI
+starlette==1.0.0
+
+# Utilitário de linha de comando
+click==8.3.1
+
+# Protocolo HTTP/1.1
+h11==0.16.0
+
+# Server para uvicorn com suporte a HTTP tools
+httptools==0.7.1
+
+# Serialização YAML
+pyyaml==6.0.3
+
+# Biblioteca para monitorar mudanças em arquivos
+watchfiles==1.1.1
+
+# Biblioteca de WebSocket
+websockets==16.0
+
+# ============================================================================
+# DEPENDÊNCIAS PARA TESTES
+# ============================================================================
+
+# Framework de testes com fixtures e plugins
+pytest==9.0.2
+
+# Plugin pytest para testes assíncrono
+pytest-asyncio==1.3.0
+
+# Sistema de plugins para pytest
+pluggy==1.6.0
+
+# Colorização de output de testes
+colorama==0.4.6
+
+# Configuração via arquivos INI
+iniconfig==2.3.0
+
+# Manipulação de especificações de versão
+packaging==26.0
+
+# ============================================================================
+# DEPENDÊNCIAS PARA DESENVOLVIMENTO
+# ============================================================================
+
+# Formatador de código Python opinionado
+black==26.3.1
+
+# Linter de estilo Python
+flake8==7.3.0
+
+# Verificação de complexidade de código
+mccabe==0.7.0
+
+# Verificação de estilo Python
+pycodestyle==2.14.0
+
+# Verificador de erros python
+pyflakes==3.4.0
+
+# Especificador de padrão de caminho
+pathspec==1.0.4
+
+# Diretórios específicos da plataforma
+platformdirs==4.9.4
+
+# Tokens Python (usado por black)
+pytokens==0.4.1
+
+# Syntax highlighting
+pygments==2.19.2
+
+# Suporte de type hints do mypy
+mypy-extensions==1.1.0
+
+# ============================================================================
+# VERSÕES FIXAS vs PASSÍVEIS
+# ============================================================================
+# As dependências principais usam versões exatas (==) para garantir
+# reprodutibilidade. Para adicionar novas dependências, considere usar
+# versões mínimas (>=) com testes adequados.
+#
+# Exemplo:
+#   Exato:     numpy==1.24.3      (sempre esta versão)
+#   Mínimo:    numpy>=1.24.3      (essa ou mais nova)
+# ============================================================================
+
