@@ -377,7 +377,7 @@
                 transition-duration: 0.01ms !important;
             }
         }
-    </style>
+    .actions-bar { display: flex; gap: 10px; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1); flex-wrap: wrap; } .action-btn { background-color: #334155; color: white; border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; } .action-btn:hover { background-color: #475569; transform: translateY(-2px); } .btn-telegram { background-color: #0088cc; border-color: #0088cc; } .btn-telegram:hover { background-color: #0077b3; } </style>
 </head>
 <body>
     <div class="container">
@@ -424,7 +424,7 @@
 
             <div class="summary-content" id="summaryContent"></div>
 
-            <div class="model-info" id="modelInfo"></div>
+            <div class="model-info" id="modelInfo"></div><div class="actions-bar"><button class="action-btn" onclick="copiarResumo()">?? Copiar Resumo</button><button class="action-btn" onclick="baixarMarkdown()">?? Baixar como .MD (Obsidian)</button><button class="action-btn btn-telegram" onclick="enviarTelegram()">?? Enviar para o Telegram</button></div>
         </div>
     </div>
 
@@ -589,6 +589,30 @@
 
         console.log('✨ PDF Summarizer AI - Interface carregada');
         console.log('API endpoint:', API_URL);
+            function copiarResumo() {
+            const text = summaryContent.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                showSuccess('Copiado para a rea de transferncia!');
+                setTimeout(hideAlerts, 2000);
+            });
+        }
+
+        function baixarMarkdown() {
+            const text = summaryContent.innerText;
+            const blob = new Blob([text], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = \Resumo_\.md\;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function enviarTelegram() {
+            alert('A UI j est pronta! O prximo passo  fazermos o Python enviar este texto para a API do seu bot.');
+        }
     </script>
 </body>
 </html>
+
+
