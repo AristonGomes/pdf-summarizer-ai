@@ -608,11 +608,43 @@
             URL.revokeObjectURL(url);
         }
 
-        function enviarTelegram() {
-            alert('A UI j est pronta! O prximo passo  fazermos o Python enviar este texto para a API do seu bot.');
+                function enviarTelegram() {
+            const text = summaryContent.innerText;
+            const btn = document.querySelector('.btn-telegram');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '? Enviando...';
+            btn.disabled = true;
+
+            fetch('http://localhost:8000/send-telegram', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    texto: text,
+                    nome_arquivo: fileName.textContent
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'sucesso') {
+                    showSuccess('?? Sucesso! O resumo foi despachado para o Obsidian via Telegram.');
+                } else {
+                    showError(data.detail || 'Erro desconhecido ao enviar para o Telegram.');
+                }
+            })
+            .catch(err => {
+                showError('Falha ao comunicar com o servidor para envio ao Telegram.');
+                console.error(err);
+            })
+            .finally(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                setTimeout(hideAlerts, 5000);
+            });
         }
     </script>
 </body>
 </html>
+
 
 

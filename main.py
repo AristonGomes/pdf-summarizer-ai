@@ -290,6 +290,40 @@ else:
     print("       Para ativar: pip install sqlalchemy redis python-jose passlib cryptography")
 
 
+from pydantic import BaseModel
+import requests
+
+class TelegramRequest(BaseModel):
+    texto: str
+    nome_arquivo: str
+
+@app.post("/send-telegram")
+async def send_to_telegram(req: TelegramRequest):
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    
+    if not token or not chat_id:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail="Credenciais do Telegram no configuradas no .env")
+    
+    # Formata a mensagem
+    msg_texto = f"?? *Resumo:* {req.nome_arquivo}\n\n{req.texto}"
+    
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": msg_texto,
+        "parse_mode": "Markdown"
+    }
+    
+    try:
+        response = requests.post(url, json=payload)
+        response.raise_for_status()
+        return {"status": "sucesso", "mensagem": "Resumo enviado para o Telegram!"}
+    except Exception as e:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=f"Erro ao enviar para Telegram: {str(e)}")
+
 if __name__ == "__main__":
     import uvicorn
     
@@ -302,4 +336,6 @@ if __name__ == "__main__":
     print("="*60 + "\n")
     
     uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
+
+
 
