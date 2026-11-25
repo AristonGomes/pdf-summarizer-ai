@@ -626,4 +626,4 @@ resultado = model.generate_content(prompt)
 
 ---
 
-**Desenvolvido com ❤️ para processamento inteligente de documentos!**
+**Autor:** [Ariston Gomes](https://www.linkedin.com/in/ariston-gomes/) • Projeto desenvolvido para aplicação prática de processamento inteligente de documentos.
